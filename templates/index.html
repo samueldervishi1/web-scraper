@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper - Reddit</title>
+    <link rel="icon" href="{{ url_for('static', filename='defaultapp.png') }}" type="image/png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .post {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 10px 0;
+            padding: 15px;
+        }
+
+        .post h2 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .post a {
+            color: #0077b5;
+            text-decoration: none;
+        }
+
+        .post p {
+            color: #666;
+            font-size: 1em;
+            margin: 10px 0 0;
+        }
+
+        #showMoreBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #0077b5;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #showMoreBtn:hover {
+            background-color: #005f8b;
+        }
+    </style>
+</head>
+<body>
+<h1>Top Posts from Reddit</h1>
+<div id="postList">
+    {% for item in data %}
+        <div class="post">
+            <h2>{{ item.title }}</h2>
+            <p><strong>Subreddit:</strong> {{ item.subreddit }}</p>
+            <p><strong>Score:</strong> {{ item.score }}</p>
+            <p><strong>URL:</strong> <a href="{{ item.url }}" target="_blank">{{ item.url }}</a></p>
+        </div>
+    {% endfor %}
+</div>
+<button id="showMoreBtn" onclick="loadMorePosts()">Show More</button>
+
+<script>
+    let currentIndex = 5;
+
+    function loadMorePosts() {
+        fetch(`/load_more/${currentIndex}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('post');
+                    postElement.innerHTML = `
+                            <h2>${post.title}</h2>
+                            <p><strong>Subreddit:</strong> ${post.subreddit}</p>
+                            <p><strong>Score:</strong> ${post.score}</p>
+                            <p><strong>URL:</strong> <a href="${post.url}" target="_blank">${post.url}</a></p>
+                        `;
+                    document.getElementById('postList').appendChild(postElement);
+                });
+                currentIndex += 5;
+            });
+    }
+</script>
+</body>
+</html>
